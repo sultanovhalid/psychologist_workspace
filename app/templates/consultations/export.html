@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Экспорт консультаций — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Экспорт консультаций для 1С</h2>
+
+<div class="card" style="max-width:600px; margin-bottom:28px;">
+    <p>
+        Вы можете выгрузить все консультации в CSV-файл для импорта в 1С или Excel.<br>
+        Формат файла: <b>UTF-8 с BOM, разделитель — ;</b>
+    </p>
+    <ul>
+        <li><b>Дата</b> — Дата и время консультации</li>
+        <li><b>ФИО студента</b></li>
+        <li><b>Группа</b></li>
+        <li><b>Тема</b></li>
+        <li><b>Тип консультации</b></li>
+        <li><b>Результат</b></li>
+        <li><b>Психолог</b></li>
+    </ul>
+    <form method="get" action="{{ url_for('consultations.export_consultations') }}">
+        <button type="submit" class="btn btn-primary" style="margin-top:14px;">Скачать файл для 1С</button>
+    </form>
+</div>
+
+<div>
+    <a href="{{ url_for('consultations.list_consultations') }}" class="btn">Назад к списку консультаций</a>
+</div>
+{% endblock %}
