@@ -97,4 +97,6 @@
 <div style="margin-top:32px;">
     <a href="{{ url_for('analytics.overview') }}" class="btn">Обновить статистику</a>
     <a href="{{ url_for('analytics.overview') }}?group_id=&type=&start_date=&end_date=" class="btn" style="margin-left:10px;">Сбросить фильтры</a>
-    <a href="{{ url_for('analytics_
+    {# <a href="{{ url_for('analytics.export') }}" class="btn" style="margin-left:10px;">Экспортировать в Excel</a> #}
+</div>
+{% endblock %}
