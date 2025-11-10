@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Добро пожаловать{% if current_user.full_name %}, {{ current_user.full_name }}{% endif %}!</h2>
+
+<div style="display: flex; gap: 32px; flex-wrap: wrap; margin: 32px 0 16px 0;">
+    <div class="card" style="flex: 1 1 220px; min-width: 210px;">
+        <h3>Студенты</h3>
+        <p>В базе: <b>{{ stats.students }}</b></p>
+        <a href="{{ url_for('students.list_students') }}" class="btn">Перейти</a>
+    </div>
+    <div class="card" style="flex: 1 1 220px; min-width: 210px;">
+        <h3>Группы</h3>
+        <p>В базе: <b>{{ stats.groups }}</b></p>
+        <a href="{{ url_for('groups.list_groups') }}" class="btn">Перейти</a>
+    </div>
+    <div class="card" style="flex: 1 1 220px; min-width: 210px;">
+        <h3>Консультации</h3>
+        <p>В базе: <b>{{ stats.consultations }}</b></p>
+        <a href="{{ url_for('consultations.list_consultations') }}" class="btn">Перейти</a>
+    </div>
+    <div class="card" style="flex: 1 1 220px; min-width: 210px;">
+        <h3>Аналитика</h3>
+        <p>Просмотр статистики и графиков по консультациям.</p>
+        <a href="{{ url_for('analytics.overview') }}" class="btn">Перейти</a>
+    </div>
+</div>
+
+<hr style="margin: 36px 0;">
+
+<div style="display:flex; flex-wrap: wrap; gap:36px;">
+    <div style="flex: 2 1 340px; min-width: 270px;">
+        <h3>Последние консультации</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Студент</th>
+                    <th>Группа</th>
+                    <th>Тема</th>
+                    <th>Психолог</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for c in recent_consultations %}
+                <tr>
+                    <td>{{ c.date.strftime('%d.%m.%Y %H:%M') }}</td>
+                    <td>{{ c.student.full_name if c.student else '' }}</td>
+                    <td>{{ c.group.name if c.group else '' }}</td>
+                    <td>{{ c.topic }}</td>
+                    <td>{{ c.psychologist }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5"><i>Нет данных</i></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div style="flex: 1 1 270px; min-width: 210px;">
+        <h3>Быстрые действия</h3>
+        <ul style="margin-top:12px; line-height:2;">
+            <li><a href="{{ url_for('consultations.add_consultation') }}">+ Новая консультация</a></li>
+            <li><a href="{{ url_for('students.add_student') }}">+ Новый студент</a></li>
+            <li><a href="{{ url_for('groups.add_group') }}">+ Новая группа</a></li>
+            <li><a href="{{ url_for('consultations.export_consultations') }}">Выгрузить для 1С</a></li>
+            {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                <li><a href="{{ url_for('admin.users') }}">Пользователи и права</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
