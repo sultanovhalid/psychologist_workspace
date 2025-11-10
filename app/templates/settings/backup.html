@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Резервное копирование — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Резервное копирование базы данных</h2>
+
+<div class="card" style="max-width:540px;">
+    <p>Рекомендуется регулярно создавать резервные копии базы данных. Скачанные файлы можно хранить для восстановления или передачи данных.</p>
+    <form method="post" action="{{ url_for('backup.make_backup') }}">
+        <button type="submit" class="btn btn-primary" style="margin-top:14px;">Сделать резервную копию</button>
+    </form>
+</div>
+
+{% set backup_dir = config.SQLALCHEMY_DATABASE_URI.replace('sqlite:///', '').rsplit('/', 1)[0] + '/backups' %}
+{% set backups = [] %}
+{% if backup_dir and os.path.isdir(backup_dir) %}
+    {% set backups = os.listdir(backup_dir)|sort(reverse=True) %}
+{% endif %}
+
+{% if backups %}
+    <h3 style="margin-top:38px;">Сохранённые копии</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Файл</th>
+                <th>Дата</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for filename in backups %}
+            <tr>
+                <td>{{ filename }}</td>
+                <td>
+                    {% set dt = filename.split('_')[-1].replace('.sqlite','') %}
+                    {{ dt[:4] }}-{{ dt[4:6] }}-{{ dt[6:8] }} {{ dt[9:11] }}:{{ dt[11:13] }}:{{ dt[13:15] }}
+                </td>
+                <td>
+                    <a href="{{ url_for('backup.download_backup', filename=filename) }}" class="btn">Скачать</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div style="margin-top:24px;">Пока нет резервных копий.</div>
+{% endif %}
+
+{% endblock %}

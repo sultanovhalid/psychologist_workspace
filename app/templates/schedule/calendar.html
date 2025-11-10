@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Календарь консультаций — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Календарь консультаций</h2>
+
+<div style="margin-bottom:20px;">
+    <a href="{{ url_for('consultations.add_consultation') }}" class="btn">+ Новая консультация</a>
+</div>
+
+<table style="max-width:800px;">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Время</th>
+            <th>Студент</th>
+            <th>Тема</th>
+            <th>Тип</th>
+            <th>Психолог</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for c in consultations %}
+        <tr>
+            <td>{{ c.date.strftime('%d.%m.%Y') }}</td>
+            <td>{{ c.date.strftime('%H:%M') }}</td>
+            <td>{{ c.student.full_name if c.student else '' }}</td>
+            <td>{{ c.topic }}</td>
+            <td>{{ c.consultation_type }}</td>
+            <td>{{ c.psychologist }}</td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="6"><i>Нет консультаций в календаре.</i></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
