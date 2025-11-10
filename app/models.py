@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 db = SQLAlchemy()
@@ -16,9 +15,10 @@ class User(db.Model):
     full_name = db.Column(db.String(128), nullable=True)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = password  # Без хеширования
+
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return self.password_hash == password  # Просто сравнение
 
 # =====================
 # Group (Группы)
