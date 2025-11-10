@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if edit %}Редактирование студента{% else %}Добавление студента{% endif %} — АРМ психолога
+{% endblock %}
+
+{% block content %}
+<h2>{% if edit %}Редактировать студента{% else %}Добавить студента{% endif %}</h2>
+<form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+        {{ form.full_name.label }}
+        {{ form.full_name(class_="form-control") }}
+        {% for error in form.full_name.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.group_id.label }}
+        {{ form.group_id(class_="form-control") }}
+        {% for error in form.group_id.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.date_of_birth.label }}
+        {{ form.date_of_birth(class_="form-control") }}
+        {% for error in form.date_of_birth.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div style="margin-top:18px;">
+        {{ form.submit(class_="btn btn-primary") }}
+        <a href="{{ url_for('students.list_students') }}" class="btn" style="margin-left:18px;">Отмена</a>
+    </div>
+</form>
+{% endblock %}
