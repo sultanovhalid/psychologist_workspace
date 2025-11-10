@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Группы — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Список групп</h2>
+
+<div style="margin-bottom: 18px;">
+    <a href="{{ url_for('groups.add_group') }}" class="btn btn-primary">+ Новая группа</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Название группы</th>
+            <th>Количество студентов</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.name }}</td>
+            <td>{{ group.students|length }}</td>
+            <td>
+                <a href="{{ url_for('groups.edit_group', group_id=group.id) }}" title="Редактировать">✏️</a>
+                <form method="post" action="{{ url_for('groups.delete_group', group_id=group.id) }}"
+                      style="display:inline;" class="delete-form">
+                    <button type="submit" title="Удалить" style="background:none;border:none;color:#e74c3c;font-size:1.1em;cursor:pointer;">🗑️</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3"><i>Нет групп.</i></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
