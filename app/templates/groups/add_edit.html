@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}
+    {% if edit %}Редактирование группы{% else %}Добавление группы{% endif %} — АРМ психолога
+{% endblock %}
+
+{% block content %}
+<h2>{% if edit %}Редактировать группу{% else %}Добавить группу{% endif %}</h2>
+<form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+        {{ form.name.label }}
+        {{ form.name(class_="form-control") }}
+        {% for error in form.name.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div style="margin-top:18px;">
+        {{ form.submit(class_="btn btn-primary") }}
+        <a href="{{ url_for('groups.list_groups') }}" class="btn" style="margin-left:18px;">Отмена</a>
+    </div>
+</form>
+{% endblock %}
