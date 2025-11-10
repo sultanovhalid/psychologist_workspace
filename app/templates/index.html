@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}АРМ психолога колледжа{% endblock %}
+
+{% block content %}
+<div style="max-width:640px;margin:32px auto 0 auto;">
+    <h2 style="text-align:center;">АРМ психолога колледжа</h2>
+    <div style="margin:30px 0 40px 0; text-align:center;">
+        <p>
+            Добро пожаловать в автоматизированное рабочее место психолога!<br>
+            Система позволяет вести электронный журнал консультаций, управлять списком студентов, анализировать результаты работы и выгружать данные для 1С.
+        </p>
+        <p>
+            <b>Вход в систему доступен только авторизованным пользователям.</b><br>
+            Если вы уже зарегистрированы, нажмите кнопку “Войти”.
+        </p>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="font-size:1.15em;">Войти</a>
+    </div>
+    <hr style="margin:40px 0;">
+    <div style="color:#888;font-size:0.98em; text-align:center;">
+        <p>Разработано для дипломного проекта на профиле “Корпоративные информационные системы”<br>
+        <span style="color:#3ca1d2;">ЧОУ ВО “Московский университет имени С.Ю. Витте”</span></p>
+    </div>
+</div>
+{% endblock %}
