@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Журнал действий — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Журнал действий</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Время</th>
+            <th>Пользователь</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for log in logs %}
+        <tr>
+            <td>{{ log.timestamp.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+            <td>
+                {% if log.user_id %}
+                    {% set user = log.user_id|get_user %}
+                    {{ user.full_name if user and user.full_name else user.username if user else '—' }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+            <td>{{ log.action }}</td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="3"><i>Нет записей в журнале.</i></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
