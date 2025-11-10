@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Аналитика — Графики{% endblock %}
+
+{% block content %}
+<h2>Графики по консультациям</h2>
+
+<div style="display:flex; flex-wrap:wrap; gap:38px;">
+    <div style="flex:1 1 360px; min-width:340px;">
+        <h3>Распределение по типу консультаций</h3>
+        <canvas id="typeChart" width="360" height="260"></canvas>
+    </div>
+    <div style="flex:1 1 360px; min-width:340px;">
+        <h3>Распределение по группам</h3>
+        <canvas id="groupChart" width="360" height="260"></canvas>
+    </div>
+</div>
+<hr style="margin:36px 0 18px 0;">
+<div style="max-width:700px;">
+    <h3>Динамика консультаций по месяцам</h3>
+    <canvas id="monthChart" width="680" height="280"></canvas>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Данные с сервера (chart_data/group_chart_data/month_chart_data)
+    const typeData = {{ chart_data|tojson }};
+    const groupData = {{ group_chart_data|tojson }};
+    const monthData = {{ month_chart_data|tojson if month_chart_data is defined else '{}' }};
+
+    // Диаграмма по типу консультаций
+    new Chart(document.getElementById('typeChart'), {
+        type: 'pie',
+        data: {
+            labels: typeData.labels,
+            datasets: [{ data: typeData.values }]
+        },
+        options: {
+            responsive: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    // Диаграмма по группам
+    new Chart(document.getElementById('groupChart'), {
+        type: 'bar',
+        data: {
+            labels: groupData.labels,
+            datasets: [{
+                label: 'Консультаций',
+                data: groupData.values
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Динамика по месяцам (линейный график)
+    if (monthData && monthData.labels) {
+        new Chart(document.getElementById('monthChart'), {
+            type: 'line',
+            data: {
+                labels: monthData.labels,
+                datasets: [{
+                    label: 'Консультаций',
+                    data: monthData.values,
+                    fill: false,
+                    tension: 0.25
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+</script>
+{% endblock %}
