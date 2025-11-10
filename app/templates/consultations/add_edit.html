@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if edit %}Редактирование консультации{% else %}Новая консультация{% endif %} — АРМ психолога
+{% endblock %}
+
+{% block content %}
+<h2>{% if edit %}Редактировать консультацию{% else %}Добавить консультацию{% endif %}</h2>
+<form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-row">
+        {{ form.date.label }}
+        {{ form.date(class_="form-control") }}
+        {% for error in form.date.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.student_id.label }}
+        {{ form.student_id(class_="form-control") }}
+        {% for error in form.student_id.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.group_id.label }}
+        {{ form.group_id(class_="form-control") }}
+        {% for error in form.group_id.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.topic.label }}
+        {{ form.topic(class_="form-control") }}
+        {% for error in form.topic.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.consultation_type.label }}
+        {{ form.consultation_type(class_="form-control") }}
+        {% for error in form.consultation_type.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.result.label }}
+        {{ form.result(class_="form-control", rows=3) }}
+        {% for error in form.result.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="form-row">
+        {{ form.psychologist.label }}
+        {{ form.psychologist(class_="form-control") }}
+        {% for error in form.psychologist.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div style="margin-top:18px;">
+        {{ form.submit(class_="btn btn-primary") }}
+        <a href="{{ url_for('consultations.list_consultations') }}" class="btn" style="margin-left:18px;">Отмена</a>
+    </div>
+</form>
+{% endblock %}
