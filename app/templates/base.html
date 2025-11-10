@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}АРМ психолога колледжа{% endblock %}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div style="font-size:1.3em; font-weight:600;">АРМ психолога колледжа</div>
+    </header>
+    <nav style="background:#313b4d; padding:10px 0;">
+        <div class="container" style="display:flex;gap:20px;align-items:center;">
+            <a href="{{ url_for('dashboard') }}">Главная</a>
+            <a href="{{ url_for('students.list_students') }}">Студенты</a>
+            <a href="{{ url_for('groups.list_groups') }}">Группы</a>
+            <a href="{{ url_for('consultations.list_consultations') }}">Консультации</a>
+            <a href="{{ url_for('analytics.overview') }}">Аналитика</a>
+            {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.users') }}">Администрирование</a>
+                <a href="{{ url_for('backup.backup_page') }}">Бэкап</a>
+            {% endif %}
+            <div style="flex:1"></div>
+            {% if current_user.is_authenticated %}
+                <span style="color:#8fd6ff;font-weight:500;">{{ current_user.full_name or current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}">Выйти</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Войти</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
