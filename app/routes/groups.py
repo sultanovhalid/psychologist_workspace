@@ -10,7 +10,7 @@ groups_bp = Blueprint('groups', __name__, url_prefix='/groups')
 @login_required
 def list_groups():
     groups = Group.query.all()
-    return render_template('students/list.html', groups=groups)
+    return render_template('groups/list.html', groups=groups)
 
 # ----------- Добавить группу -----------
 @groups_bp.route('/add', methods=['GET', 'POST'])
@@ -26,7 +26,7 @@ def add_group():
         db.session.commit()
         flash('Группа добавлена.', 'success')
         return redirect(url_for('groups.list_groups'))
-    return render_template('students/add_edit_group.html', form=form, edit=False)
+    return render_template('groups/add_edit.html', form=form, edit=False)
 
 # ----------- Редактировать группу -----------
 @groups_bp.route('/edit/<int:group_id>', methods=['GET', 'POST'])
@@ -39,7 +39,7 @@ def edit_group(group_id):
         db.session.commit()
         flash('Название группы обновлено.', 'success')
         return redirect(url_for('groups.list_groups'))
-    return render_template('students/add_edit_group.html', form=form, edit=True, group=group)
+    return render_template('groups/add_edit.html', form=form, edit=True, group=group)
 
 # ----------- Удалить группу -----------
 @groups_bp.route('/delete/<int:group_id>', methods=['POST'])
