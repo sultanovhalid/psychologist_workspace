@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.models import db, User, Log
 from app.forms import UserForm
-from werkzeug.security import generate_password_hash
 from datetime import datetime
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -24,7 +23,8 @@ def admin_required(f):
 @admin_required
 def users():
     users = User.query.all()
-    return render_template('admin/users.html', users=users)
+    form = UserForm()
+    return render_template('admin/users.html', users=users, form=form)
 
 @admin_bp.route('/users/add', methods=['GET', 'POST'])
 @login_required
@@ -34,21 +34,21 @@ def add_user():
     if form.validate_on_submit():
         if User.query.filter_by(username=form.username.data).first():
             flash('Логин уже занят!', 'warning')
-            return render_template('admin/users.html', users=User.query.all())
+            users = User.query.all()
+            return render_template('admin/users.html', users=users, form=form)
         user = User(
             username=form.username.data,
             full_name=form.full_name.data,
             role=form.role.data,
         )
-        if form.password.data:
-            user.password_hash = generate_password_hash(form.password.data)
-        else:
-            user.password_hash = generate_password_hash('defaultpass')
+        # Без хеширования!
+        user.password_hash = form.password.data if form.password.data else 'defaultpass'
         db.session.add(user)
         db.session.commit()
         flash('Пользователь добавлен.', 'success')
         return redirect(url_for('admin.users'))
-    return render_template('admin/users.html', users=User.query.all(), form=form)
+    users = User.query.all()
+    return render_template('admin/users.html', users=users, form=form)
 
 @admin_bp.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
 @login_required
@@ -61,11 +61,12 @@ def edit_user(user_id):
         user.full_name = form.full_name.data
         user.role = form.role.data
         if form.password.data:
-            user.password_hash = generate_password_hash(form.password.data)
+            user.password_hash = form.password.data  # Без хеширования!
         db.session.commit()
         flash('Данные пользователя обновлены.', 'success')
         return redirect(url_for('admin.users'))
-    return render_template('admin/users.html', users=User.query.all(), form=form, edit_id=user_id)
+    users = User.query.all()
+    return render_template('admin/users.html', users=users, form=form, edit_id=user_id)
 
 @admin_bp.route('/users/delete/<int:user_id>', methods=['POST'])
 @login_required
