@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Журнал консультаций — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Журнал консультаций</h2>
+
+<div class="filter-row">
+    <form method="get" class="search-box" style="margin-right:10px;">
+        {{ form.query(size=24, placeholder="Поиск по студенту...") }}
+        <button type="submit" class="btn">Искать</button>
+    </form>
+    <form method="get">
+        <label for="group_id">Группа:</label>
+        <select name="group_id" id="group_id" onchange="this.form.submit()">
+            <option value="">Все</option>
+            {% for group in groups %}
+                <option value="{{ group.id }}" {% if group_id and group_id == group.id %}selected{% endif %}>{{ group.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <div style="flex:1"></div>
+    <a href="{{ url_for('consultations.add_consultation') }}" class="btn">+ Новая консультация</a>
+    <a href="{{ url_for('consultations.export_consultations') }}" class="btn" style="margin-left:10px;">Выгрузить для 1С</a>
+</div>
+
+<table id="consultationsTable">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Студент</th>
+            <th>Группа</th>
+            <th>Тема</th>
+            <th>Тип</th>
+            <th>Психолог</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for c in consultations %}
+        <tr>
+            <td>{{ c.date.strftime('%d.%m.%Y %H:%M') }}</td>
+            <td>{{ c.student.full_name if c.student else '' }}</td>
+            <td>{{ c.group.name if c.group else '' }}</td>
+            <td>{{ c.topic }}</td>
+            <td>{{ c.consultation_type }}</td>
+            <td>{{ c.psychologist }}</td>
+            <td>
+                <a href="{{ url_for('consultations.edit_consultation', consultation_id=c.id) }}" title="Редактировать">✏️</a>
+                <form method="post" action="{{ url_for('consultations.delete_consultation', consultation_id=c.id) }}"
+                      style="display:inline;" class="delete-form">
+                    <button type="submit" title="Удалить" style="background:none;border:none;color:#e74c3c;font-size:1.1em;cursor:pointer;">🗑️</button>
+                </form>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="7"><i>Нет консультаций.</i></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
