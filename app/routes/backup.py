@@ -20,7 +20,23 @@ def admin_required(f):
 @login_required
 @admin_required
 def backup_page():
-    return render_template('settings/backup.html')
+    db_path = current_app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+    backup_dir = os.path.join(os.path.dirname(db_path), "backups")
+    is_dir = os.path.isdir(backup_dir)
+    backups = []
+    if is_dir:
+        # Список файлов-бекапов, отсортированных по дате изменения (от новых к старым)
+        backups = sorted(
+            [f for f in os.listdir(backup_dir) if f.endswith('.sqlite')],
+            key=lambda f: os.path.getmtime(os.path.join(backup_dir, f)),
+            reverse=True
+        )
+    return render_template(
+        'settings/backup.html',
+        backup_dir=backup_dir,
+        is_dir=is_dir,
+        backups=backups
+    )
 
 @backup_bp.route('/make', methods=['POST'])
 @login_required
