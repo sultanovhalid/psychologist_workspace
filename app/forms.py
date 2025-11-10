@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, DateTimeField, TextAreaField, HiddenField
+from wtforms import DateTimeField, StringField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
 # ----- Вход (логин) -----
@@ -22,7 +22,11 @@ class GroupForm(FlaskForm):
 
 # ----- Консультация -----
 class ConsultationForm(FlaskForm):
-    date = DateTimeField('Дата и время консультации', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+    date = DateTimeField(
+        'Дата и время консультации',
+        format='%Y-%m-%dT%H:%M',  # именно T для input type="datetime-local"
+        validators=[DataRequired(message="Укажите дату и время консультации!")]
+    )
     student_id = SelectField('Студент', coerce=int, validators=[DataRequired()])
     group_id = SelectField('Группа', coerce=int, validators=[Optional()])
     topic = StringField('Тема консультации', validators=[DataRequired(), Length(1, 255)])
