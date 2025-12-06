@@ -1,102 +1,219 @@
 {% extends 'base.html' %}
 
-{% block title %}Аналитика — Общая статистика{% endblock %}
+{% block title %}Аналитика — АРМ психолога{% endblock %}
 
 {% block content %}
-<h2>Общая аналитика по консультациям</h2>
+<h2>Аналитика работы психолога</h2>
 
-<form method="get" class="filter-row" style="gap:18px;">
+<form method="get" class="filter-row" style="margin-top: 10px;">
     <div>
-        <label for="group_id">Группа:</label>
-        <select name="group_id" id="group_id">
-            <option value="">Все</option>
-            {% for group in groups %}
-                <option value="{{ group.id }}" {% if group_id and group_id == group.id %}selected{% endif %}>{{ group.name }}</option>
+        <label for="group_id">Группа</label>
+        <select name="group_id" id="group_id" class="form-control">
+            <option value="">Все группы</option>
+            {% for g in groups %}
+                <option value="{{ g.id }}"
+                        {% if group_id == g.id %}selected{% endif %}>
+                    {{ g.name }}
+                </option>
             {% endfor %}
         </select>
     </div>
+
     <div>
-        <label for="type">Тип консультации:</label>
-        <select name="type" id="type">
-            <option value="">Все</option>
-            <option value="Индивидуальная" {% if consultation_type == "Индивидуальная" %}selected{% endif %}>Индивидуальная</option>
-            <option value="Групповая" {% if consultation_type == "Групповая" %}selected{% endif %}>Групповая</option>
-            <option value="Тестирование" {% if consultation_type == "Тестирование" %}selected{% endif %}>Тестирование</option>
+        <label for="type">Тип консультации</label>
+        <select name="type" id="type" class="form-control">
+            <option value="">Все типы</option>
+            <option value="Индивидуальная"
+                    {% if consultation_type == 'Индивидуальная' %}selected{% endif %}>
+                Индивидуальная
+            </option>
+            <option value="Групповая"
+                    {% if consultation_type == 'Групповая' %}selected{% endif %}>
+                Групповая
+            </option>
+            <option value="Тестирование"
+                    {% if consultation_type == 'Тестирование' %}selected{% endif %}>
+                Тестирование
+            </option>
         </select>
     </div>
+
     <div>
-        <label for="start_date">С:</label>
-        <input type="date" name="start_date" id="start_date" value="{{ start_date or '' }}">
+        <label for="start_date">Дата с</label>
+        <input type="date" id="start_date" name="start_date"
+               class="form-control"
+               value="{{ start_date or '' }}">
     </div>
+
     <div>
-        <label for="end_date">По:</label>
-        <input type="date" name="end_date" id="end_date" value="{{ end_date or '' }}">
+        <label for="end_date">Дата по</label>
+        <input type="date" id="end_date" name="end_date"
+               class="form-control"
+               value="{{ end_date or '' }}">
     </div>
-    <button type="submit" class="btn">Показать</button>
+
+    <div>
+        <button type="submit" class="btn">Применить фильтры</button>
+    </div>
 </form>
 
-<div style="display:flex; gap:40px; flex-wrap:wrap; margin-top:22px;">
-    <div style="flex:1 1 320px; min-width:260px;">
-        <div class="card">
-            <h3>Всего консультаций:</h3>
-            <div style="font-size:2em; color:#2d9cdb;">{{ total }}</div>
-        </div>
-        <div class="card" style="margin-top:16px;">
-            <h3>По типу консультаций</h3>
-            <ul style="margin-top:6px;">
-                {% for t, n in chart_data.labels|zip(chart_data.values) %}
-                    <li><b>{{ t }}</b>: {{ n }}</li>
-                {% else %}
-                    <li><i>Нет данных</i></li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="card" style="margin-top:16px;">
-            <h3>По группам</h3>
-            <ul style="margin-top:6px;">
-                {% for g, n in group_chart_data.labels|zip(group_chart_data.values) %}
-                    <li><b>{{ g }}</b>: {{ n }}</li>
-                {% else %}
-                    <li><i>Нет данных</i></li>
-                {% endfor %}
-            </ul>
-        </div>
+<hr style="margin: 16px 0 20px 0;">
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Консультации</h3>
+        <p>Всего консультаций по фильтру:</p>
+        <p><b>{{ total }}</b></p>
     </div>
-    <div style="flex:2 1 460px; min-width:320px;">
-        <h3 style="margin-bottom:6px;">Таблица консультаций (выборка)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Студент</th>
-                    <th>Группа</th>
-                    <th>Тема</th>
-                    <th>Тип</th>
-                    <th>Психолог</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in consultations %}
-                    <tr>
-                        <td>{{ c.date.strftime('%d.%m.%Y %H:%M') }}</td>
-                        <td>{{ c.student.full_name if c.student else '' }}</td>
-                        <td>{{ c.group.name if c.group else '' }}</td>
-                        <td>{{ c.topic }}</td>
-                        <td>{{ c.consultation_type }}</td>
-                        <td>{{ c.psychologist }}</td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="6"><i>Нет данных</i></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card">
+        <h3>Групповые мероприятия</h3>
+        <p>Всего мероприятий по фильтру:</p>
+        <p><b>{{ events_total }}</b></p>
+    </div>
+    <div class="card">
+        <h3>Группа риска</h3>
+        <p>Всего записей по фильтру: <b>{{ risk_total }}</b></p>
+        <p>Из них активных: <b>{{ risk_active }}</b></p>
+    </div>
+    <div class="card">
+        <h3>Диагностика</h3>
+        <p>Результатов тестирования по фильтру: <b>{{ test_results_total }}</b></p>
+        <p>Методик в базе: <b>{{ tests_total }}</b></p>
     </div>
 </div>
-<div style="margin-top:32px;">
-    <a href="{{ url_for('analytics.overview') }}" class="btn">Обновить статистику</a>
-    <a href="{{ url_for('analytics.overview') }}?group_id=&type=&start_date=&end_date=" class="btn" style="margin-left:10px;">Сбросить фильтры</a>
-    {# <a href="{{ url_for('analytics.export') }}" class="btn" style="margin-left:10px;">Экспортировать в Excel</a> #}
-</div>
+
+<hr style="margin: 24px 0 18px 0;">
+
+<h3>Распределение консультаций по типам</h3>
+{% if chart_data.labels and chart_data.labels|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>Тип консультации</th>
+            <th>Количество</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(chart_data.labels|length) %}
+            <tr>
+                <td>{{ chart_data.labels[i] }}</td>
+                <td>{{ chart_data.values[i] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p><i>Нет данных по консультациям для выбранных фильтров.</i></p>
+{% endif %}
+
+<h3>Распределение консультаций по группам</h3>
+{% if group_chart_data.labels and group_chart_data.labels|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>Группа</th>
+            <th>Количество консультаций</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(group_chart_data.labels|length) %}
+            <tr>
+                <td>{{ group_chart_data.labels[i] }}</td>
+                <td>{{ group_chart_data.values[i] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p><i>Нет данных по группам для выбранных фильтров.</i></p>
+{% endif %}
+
+<h3>Групповые мероприятия по типам</h3>
+{% if events_chart_data.labels and events_chart_data.labels|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>Тип мероприятия</th>
+            <th>Количество</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(events_chart_data.labels|length) %}
+            <tr>
+                <td>{{ events_chart_data.labels[i] }}</td>
+                <td>{{ events_chart_data.values[i] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p><i>Нет данных по мероприятиям для выбранных фильтров.</i></p>
+{% endif %}
+
+<h3>Студенты «группы риска» по уровням</h3>
+{% if risk_chart_data.labels and risk_chart_data.labels|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>Уровень риска</th>
+            <th>Количество студентов</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(risk_chart_data.labels|length) %}
+            <tr>
+                <td>{{ risk_chart_data.labels[i]|capitalize }}</td>
+                <td>{{ risk_chart_data.values[i] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p><i>Нет данных по группе риска для выбранных фильтров.</i></p>
+{% endif %}
+
+<h3>Результаты тестирования по методикам</h3>
+{% if test_by_test_chart.labels and test_by_test_chart.labels|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>Методика</th>
+            <th>Количество результатов</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(test_by_test_chart.labels|length) %}
+            <tr>
+                <td>{{ test_by_test_chart.labels[i] }}</td>
+                <td>{{ test_by_test_chart.values[i] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p><i>Нет данных по методикам для выбранных фильтров.</i></p>
+{% endif %}
+
+<h3>Результаты тестирования по уровням</h3>
+{% if test_by_level_chart.labels and test_by_level_chart.labels|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>Уровень / интерпретация</th>
+            <th>Количество</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(test_by_level_chart.labels|length) %}
+            <tr>
+                <td>{{ test_by_level_chart.labels[i] }}</td>
+                <td>{{ test_by_level_chart.values[i] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p><i>Нет данных по уровням результатов для выбранных фильтров.</i></p>
+{% endif %}
+
 {% endblock %}
