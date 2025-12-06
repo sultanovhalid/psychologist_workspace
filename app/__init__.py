@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_login import LoginManager
 from app.models import db, User, init_db
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_pyfile('../config.py')
@@ -29,6 +30,12 @@ def create_app():
     from app.routes.consultations import consultations_bp
     from app.routes.backup import backup_bp
 
+    # новые блюпринты
+    from app.routes.consultation_topics import consultation_topics_bp
+    from app.routes.group_events import group_events_bp
+    from app.routes.diagnostics import diagnostics_bp
+    from app.routes.risk_groups import risk_groups_bp
+
     app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(analytics_bp)
@@ -37,7 +44,13 @@ def create_app():
     app.register_blueprint(consultations_bp)
     app.register_blueprint(backup_bp)
 
-    # Главная страница (сделаем без app.render_template — нужен import!)
+    # регистрация новых
+    app.register_blueprint(consultation_topics_bp)
+    app.register_blueprint(group_events_bp)
+    app.register_blueprint(diagnostics_bp)
+    app.register_blueprint(risk_groups_bp)
+
+    # Главная страница
     @app.route('/')
     def index():
         from flask_login import current_user
@@ -49,8 +62,17 @@ def create_app():
             'groups': Group.query.count(),
             'consultations': Consultation.query.count(),
         }
-        recent_consultations = Consultation.query.order_by(Consultation.date.desc()).limit(7).all()
-        return render_template('dashboard.html', stats=stats, recent_consultations=recent_consultations)
+        recent_consultations = (
+            Consultation.query
+            .order_by(Consultation.date.desc())
+            .limit(7)
+            .all()
+        )
+        return render_template(
+            'dashboard.html',
+            stats=stats,
+            recent_consultations=recent_consultations
+        )
 
     # Создание БД и наполнение тестовыми данными
     with app.app_context():
