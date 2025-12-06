@@ -26,6 +26,23 @@
         <p>Просмотр статистики и графиков по консультациям.</p>
         <a href="{{ url_for('analytics.overview') }}" class="btn">Перейти</a>
     </div>
+
+    <!-- Новые карточки со статистикой -->
+    <div class="card" style="flex: 1 1 220px; min-width: 210px;">
+        <h3>Групповые мероприятия</h3>
+        <p>Проведено: <b>{{ stats.group_events }}</b></p>
+        <a href="{{ url_for('group_events.list_events') }}" class="btn">Перейти</a>
+    </div>
+    <div class="card" style="flex: 1 1 220px; min-width: 210px;">
+        <h3>Группа риска</h3>
+        <p>Студентов в группе риска: <b>{{ stats.risk_students }}</b></p>
+        <a href="{{ url_for('risk_groups.list_risk') }}" class="btn">Перейти</a>
+    </div>
+    <div class="card" style="flex: 1 1 220px; min-width: 210px;">
+        <h3>Диагностика</h3>
+        <p>Результатов тестирования: <b>{{ stats.test_results }}</b></p>
+        <a href="{{ url_for('diagnostics.list_results') }}" class="btn">Перейти</a>
+    </div>
 </div>
 
 <hr style="margin: 36px 0;">
