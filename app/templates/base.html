@@ -18,14 +18,24 @@
             <a href="{{ url_for('students.list_students') }}">Студенты</a>
             <a href="{{ url_for('groups.list_groups') }}">Группы</a>
             <a href="{{ url_for('consultations.list_consultations') }}">Консультации</a>
+
+            <!-- новые разделы -->
+            <a href="{{ url_for('consultation_topics.list_topics') }}">Тематики консультаций</a>
+            <a href="{{ url_for('group_events.list_events') }}">Групповые мероприятия</a>
+            <a href="{{ url_for('diagnostics.list_results') }}">Диагностика</a>
+            <a href="{{ url_for('risk_groups.list_risk') }}">Группа риска</a>
+
             <a href="{{ url_for('analytics.overview') }}">Аналитика</a>
+
             {% if current_user.is_authenticated and current_user.role == 'admin' %}
                 <a href="{{ url_for('admin.users') }}">Администрирование</a>
                 <a href="{{ url_for('backup.backup_page') }}">Бэкап</a>
             {% endif %}
             <div style="flex:1"></div>
             {% if current_user.is_authenticated %}
-                <span style="color:#8fd6ff;font-weight:500;">{{ current_user.full_name or current_user.username }}</span>
+                <span style="color:#8fd6ff;font-weight:500;">
+                    {{ current_user.full_name or current_user.username }}
+                </span>
                 <a href="{{ url_for('auth.logout') }}">Выйти</a>
             {% else %}
                 <a href="{{ url_for('auth.login') }}">Войти</a>
