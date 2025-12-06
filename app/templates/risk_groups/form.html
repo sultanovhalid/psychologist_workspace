@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if title %}{{ title }} — АРМ психолога{% else %}Группа риска — АРМ психолога{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{% if title %}{{ title }}{% else %}Запись о «группе риска»{% endif %}</h2>
+
+<div class="card" style="max-width: 700px; margin-top: 20px;">
+    <form method="post">
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+            <label for="student_id">{{ form.student_id.label }}</label>
+            {{ form.student_id(class="form-control", id="student_id") }}
+            {% for error in form.student_id.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="date_added">{{ form.date_added.label }}</label>
+            {{ form.date_added(class="form-control", id="date_added") }}
+            <small class="form-help">Формат: ГГГГ-ММ-ДД</small>
+            {% for error in form.date_added.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="risk_level">{{ form.risk_level.label }}</label>
+            {{ form.risk_level(class="form-control", id="risk_level") }}
+            {% for error in form.risk_level.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="status">{{ form.status.label }}</label>
+            {{ form.status(class="form-control", id="status") }}
+            {% for error in form.status.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="date_removed">{{ form.date_removed.label }}</label>
+            {{ form.date_removed(class="form-control", id="date_removed") }}
+            <small class="form-help">Заполняется при снятии с учёта (формат: ГГГГ-ММ-ДД).</small>
+            {% for error in form.date_removed.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="reason">{{ form.reason.label }}</label>
+            {{ form.reason(class="form-control", id="reason", rows="3") }}
+            {% for error in form.reason.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 16px; display:flex; gap:12px; align-items:center;">
+            {{ form.submit(class="btn") }}
+            <a href="{{ url_for('risk_groups.list_risk') }}">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
