@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Результаты тестирования — АРМ психолога{% endblock %}
+
+{% block content %}
+<h2>Результаты психодиагностического тестирования</h2>
+
+<div style="margin: 16px 0 24px 0; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
+    <a href="{{ url_for('diagnostics.create_result') }}" class="btn">+ Новый результат</a>
+
+    <form method="get"
+          action="{{ url_for('diagnostics.list_results') }}"
+          style="display:flex; flex-wrap:wrap; gap:8px; align-items:flex-end; margin-left:auto;">
+        <div>
+            <label for="student_id" style="display:block; font-size:0.9em;">Студент</label>
+            <select name="student_id" id="student_id">
+                <option value="">Все студенты</option>
+                {% for s in students %}
+                    <option value="{{ s.id }}"
+                            {% if selected_student_id == s.id %}selected{% endif %}>
+                        {{ s.full_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="test_id" style="display:block; font-size:0.9em;">Методика</label>
+            <select name="test_id" id="test_id">
+                <option value="">Все методики</option>
+                {% for t in tests %}
+                    <option value="{{ t.id }}"
+                            {% if selected_test_id == t.id %}selected{% endif %}>
+                        {{ t.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <button type="submit" class="btn">Фильтровать</button>
+        </div>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Студент</th>
+            <th>Методика</th>
+            <th>Результат</th>
+            <th>Уровень / интерпретация</th>
+            <th>Психолог</th>
+            <th>Комментарий</th>
+            <th style="width:150px;">Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in results %}
+        <tr>
+            <td>
+                {% if r.date %}
+                    {{ r.date.strftime('%d.%m.%Y %H:%M') }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+            <td>{{ r.student.full_name if r.student else '—' }}</td>
+            <td>
+                {% if r.test %}
+                    {{ r.test.name }}
+                    {% if r.test.short_name %}
+                        <br><small>({{ r.test.short_name }})</small>
+                    {% endif %}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+            <td>{{ r.raw_score or '—' }}</td>
+            <td>{{ r.level or '—' }}</td>
+            <td>
+                {% if r.psychologist_user %}
+                    {{ r.psychologist_user.full_name or r.psychologist_user.username }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+            <td>
+                {% if r.comment %}
+                    {{ r.comment }}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('diagnostics.edit_result', result_id=r.id) }}">Изменить</a>
+                |
+                <form action="{{ url_for('diagnostics.delete_result', result_id=r.id) }}"
+                      method="post"
+                      style="display:inline;"
+                      onsubmit="return confirm('Удалить результат тестирования для «{{ r.student.full_name if r.student else "" }}»?');">
+                    <button type="submit" class="link-button">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="8"><i>Результаты тестирования пока не добавлены.</i></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
