@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if title %}{{ title }} — АРМ психолога{% else %}Тематика консультации — АРМ психолога{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{% if title %}{{ title }}{% else %}Тематика консультации{% endif %}</h2>
+
+<div class="card" style="max-width: 600px; margin-top: 20px;">
+    <form method="post">
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+            <label for="name">{{ form.name.label }}</label>
+            {{ form.name(class="form-control", id="name") }}
+            {% for error in form.name.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="description">{{ form.description.label }}</label>
+            {{ form.description(class="form-control", id="description", rows="3") }}
+            {% for error in form.description.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group" style="margin: 10px 0;">
+            <label>
+                {{ form.is_active() }}
+                {{ form.is_active.label.text }}
+            </label>
+            {% for error in form.is_active.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 16px; display:flex; gap:12px; align-items:center;">
+            {{ form.submit(class="btn") }}
+            <a href="{{ url_for('consultation_topics.list_topics') }}">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
