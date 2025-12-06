@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if title %}{{ title }} — АРМ психолога{% else %}Результат тестирования — АРМ психолога{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{% if title %}{{ title }}{% else %}Результат психодиагностического тестирования{% endif %}</h2>
+
+<div class="card" style="max-width: 700px; margin-top: 20px;">
+    <form method="post">
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+            <label for="date">{{ form.date.label }}</label>
+            {{ form.date(class="form-control", id="date") }}
+            <small class="form-help">Формат: ГГГГ-ММ-ДД ЧЧ:ММ</small>
+            {% for error in form.date.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="student_id">{{ form.student_id.label }}</label>
+            {{ form.student_id(class="form-control", id="student_id") }}
+            {% for error in form.student_id.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="test_id">{{ form.test_id.label }}</label>
+            {{ form.test_id(class="form-control", id="test_id") }}
+            {% for error in form.test_id.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="raw_score">{{ form.raw_score.label }}</label>
+            {{ form.raw_score(class="form-control", id="raw_score") }}
+            {% for error in form.raw_score.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="level">{{ form.level.label }}</label>
+            {{ form.level(class="form-control", id="level") }}
+            {% for error in form.level.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="comment">{{ form.comment.label }}</label>
+            {{ form.comment(class="form-control", id="comment", rows="3") }}
+            {% for error in form.comment.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="psychologist_id">{{ form.psychologist_id.label }}</label>
+            {{ form.psychologist_id(class="form-control", id="psychologist_id") }}
+            {% for error in form.psychologist_id.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 16px; display:flex; gap:12px; align-items:center;">
+            {{ form.submit(class="btn") }}
+            <a href="{{ url_for('diagnostics.list_results') }}">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
