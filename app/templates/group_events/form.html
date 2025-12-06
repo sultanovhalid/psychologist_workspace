@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if title %}{{ title }} — АРМ психолога{% else %}Групповое мероприятие — АРМ психолога{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{% if title %}{{ title }}{% else %}Групповое мероприятие{% endif %}</h2>
+
+<div class="card" style="max-width: 700px; margin-top: 20px;">
+    <form method="post">
+        {{ form.csrf_token }}
+
+        <div class="form-group">
+            <label for="date">{{ form.date.label }}</label>
+            {{ form.date(class="form-control", id="date") }}
+            <small class="form-help">Формат: ГГГГ-ММ-ДД ЧЧ:ММ</small>
+            {% for error in form.date.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="group_id">{{ form.group_id.label }}</label>
+            {{ form.group_id(class="form-control", id="group_id") }}
+            <small class="form-help">Можно оставить пустым для общеколледжного мероприятия.</small>
+            {% for error in form.group_id.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="title">{{ form.title.label }}</label>
+            {{ form.title(class="form-control", id="title") }}
+            {% for error in form.title.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="event_type">{{ form.event_type.label }}</label>
+            {{ form.event_type(class="form-control", id="event_type") }}
+            {% for error in form.event_type.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="psychologist_id">{{ form.psychologist_id.label }}</label>
+            {{ form.psychologist_id(class="form-control", id="psychologist_id") }}
+            {% for error in form.psychologist_id.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="participants_count">{{ form.participants_count.label }}</label>
+            {{ form.participants_count(class="form-control", id="participants_count") }}
+            {% for error in form.participants_count.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label for="description">{{ form.description.label }}</label>
+            {{ form.description(class="form-control", id="description", rows="3") }}
+            {% for error in form.description.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 16px; display:flex; gap:12px; align-items:center;">
+            {{ form.submit(class="btn") }}
+            <a href="{{ url_for('group_events.list_events') }}">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
