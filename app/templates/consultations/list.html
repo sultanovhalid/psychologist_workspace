@@ -20,8 +20,11 @@
         </select>
     </form>
     <div style="flex:1"></div>
-    <a href="{{ url_for('consultations.add_consultation') }}" class="btn">+ Новая консультация</a>
+    {% if current_user.role != 'viewer' %}
+        <a href="{{ url_for('consultations.add_consultation') }}" class="btn">+ Новая консультация</a>
+    {% endif %}
     <a href="{{ url_for('consultations.export_consultations') }}" class="btn" style="margin-left:10px;">Выгрузить для 1С</a>
+    <a href="{{ url_for('consultations.export_consultations_docx') }}" class="btn" style="margin-left:10px;">Выгрузить в DOCX</a>
 </div>
 
 <table id="consultationsTable">
@@ -33,7 +36,9 @@
             <th>Тема</th>
             <th>Тип</th>
             <th>Психолог</th>
-            <th></th>
+            {% if current_user.role != 'viewer' %}
+                <th></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -45,17 +50,19 @@
             <td>{{ c.topic }}</td>
             <td>{{ c.consultation_type }}</td>
             <td>{{ c.psychologist }}</td>
-            <td>
-                <a href="{{ url_for('consultations.edit_consultation', consultation_id=c.id) }}" title="Редактировать">✏️</a>
-                <form method="post" action="{{ url_for('consultations.delete_consultation', consultation_id=c.id) }}"
-                      style="display:inline;" class="delete-form">
-                    <button type="submit" title="Удалить" style="background:none;border:none;color:#e74c3c;font-size:1.1em;cursor:pointer;">🗑️</button>
-                </form>
-            </td>
+            {% if current_user.role != 'viewer' %}
+                <td>
+                    <a href="{{ url_for('consultations.edit_consultation', consultation_id=c.id) }}" title="Редактировать">✏️</a>
+                    <form method="post" action="{{ url_for('consultations.delete_consultation', consultation_id=c.id) }}"
+                          style="display:inline;" class="delete-form">
+                        <button type="submit" title="Удалить" style="background:none;border:none;color:#e74c3c;font-size:1.1em;cursor:pointer;">🗑️</button>
+                    </form>
+                </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
-            <td colspan="7"><i>Нет консультаций.</i></td>
+            <td colspan="{% if current_user.role != 'viewer' %}7{% else %}6{% endif %}"><i>Нет консультаций.</i></td>
         </tr>
     {% endfor %}
     </tbody>
