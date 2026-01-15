@@ -20,7 +20,9 @@
         </select>
     </form>
     <div style="flex:1"></div>
-    <a href="{{ url_for('students.add_student') }}" class="btn">+ Новый студент</a>
+    {% if current_user.role != 'viewer' %}
+        <a href="{{ url_for('students.add_student') }}" class="btn">+ Новый студент</a>
+    {% endif %}
 </div>
 
 <table>
@@ -29,7 +31,9 @@
             <th>ФИО</th>
             <th>Группа</th>
             <th>Дата рождения</th>
-            <th></th>
+            {% if current_user.role != 'viewer' %}
+                <th></th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -38,17 +42,19 @@
             <td>{{ s.full_name }}</td>
             <td>{{ s.group.name if s.group else '—' }}</td>
             <td>{% if s.date_of_birth %}{{ s.date_of_birth.strftime('%d.%m.%Y') }}{% else %}—{% endif %}</td>
-            <td>
-                <a href="{{ url_for('students.edit_student', student_id=s.id) }}" title="Редактировать">✏️</a>
-                <form method="post" action="{{ url_for('students.delete_student', student_id=s.id) }}"
-                      style="display:inline;" class="delete-form">
-                    <button type="submit" title="Удалить" style="background:none;border:none;color:#e74c3c;font-size:1.1em;cursor:pointer;">🗑️</button>
-                </form>
-            </td>
+            {% if current_user.role != 'viewer' %}
+                <td>
+                    <a href="{{ url_for('students.edit_student', student_id=s.id) }}" title="Редактировать">✏️</a>
+                    <form method="post" action="{{ url_for('students.delete_student', student_id=s.id) }}"
+                          style="display:inline;" class="delete-form">
+                        <button type="submit" title="Удалить" style="background:none;border:none;color:#e74c3c;font-size:1.1em;cursor:pointer;">🗑️</button>
+                    </form>
+                </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
-            <td colspan="4"><i>Нет студентов.</i></td>
+            <td colspan="{% if current_user.role != 'viewer' %}4{% else %}3{% endif %}"><i>Нет студентов.</i></td>
         </tr>
     {% endfor %}
     </tbody>
