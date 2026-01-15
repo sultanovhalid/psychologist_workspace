@@ -20,7 +20,13 @@
             <td>{{ user.username }}</td>
             <td>{{ user.full_name or '—' }}</td>
             <td>
-                {% if user.role == 'admin' %}Администратор{% else %}Психолог{% endif %}
+                {% if user.role == 'admin' %}
+                    Администратор
+                {% elif user.role == 'viewer' %}
+                    Наблюдатель
+                {% else %}
+                    Психолог
+                {% endif %}
             </td>
             <td>
                 <a href="{{ url_for('admin.edit_user', user_id=user.id) }}">✏️</a>
