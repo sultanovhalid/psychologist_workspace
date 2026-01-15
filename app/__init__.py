@@ -1,5 +1,5 @@
-from flask import Flask, render_template
-from flask_login import LoginManager
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_login import LoginManager, current_user
 from app.models import db, User, init_db
 
 
@@ -16,6 +16,16 @@ def create_app():
     login_manager.login_view = 'auth.login'
     login_manager.login_message = "Пожалуйста, войдите в систему."
     login_manager.login_message_category = "warning"
+
+    @app.before_request
+    def block_viewer_writes():
+        if (
+            current_user.is_authenticated
+            and current_user.role == 'viewer'
+            and request.method in {'POST', 'PUT', 'PATCH', 'DELETE'}
+        ):
+            flash('Режим просмотра: изменения недоступны.', 'warning')
+            return redirect(request.referrer or url_for('index'))
 
     @login_manager.user_loader
     def load_user(user_id):
