@@ -6,7 +6,9 @@
 <h2>Результаты психодиагностического тестирования</h2>
 
 <div style="margin: 16px 0 24px 0; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
-    <a href="{{ url_for('diagnostics.create_result') }}" class="btn">+ Новый результат</a>
+    {% if current_user.role != 'viewer' %}
+        <a href="{{ url_for('diagnostics.create_result') }}" class="btn">+ Новый результат</a>
+    {% endif %}
 
     <form method="get"
           action="{{ url_for('diagnostics.list_results') }}"
@@ -53,7 +55,9 @@
             <th>Уровень / интерпретация</th>
             <th>Психолог</th>
             <th>Комментарий</th>
-            <th style="width:150px;">Действия</th>
+            {% if current_user.role != 'viewer' %}
+                <th style="width:150px;">Действия</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -93,20 +97,22 @@
                     —
                 {% endif %}
             </td>
-            <td>
-                <a href="{{ url_for('diagnostics.edit_result', result_id=r.id) }}">Изменить</a>
-                |
-                <form action="{{ url_for('diagnostics.delete_result', result_id=r.id) }}"
-                      method="post"
-                      style="display:inline;"
-                      onsubmit="return confirm('Удалить результат тестирования для «{{ r.student.full_name if r.student else "" }}»?');">
-                    <button type="submit" class="link-button">Удалить</button>
-                </form>
-            </td>
+            {% if current_user.role != 'viewer' %}
+                <td>
+                    <a href="{{ url_for('diagnostics.edit_result', result_id=r.id) }}">Изменить</a>
+                    |
+                    <form action="{{ url_for('diagnostics.delete_result', result_id=r.id) }}"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Удалить результат тестирования для «{{ r.student.full_name if r.student else "" }}»?');">
+                        <button type="submit" class="link-button">Удалить</button>
+                    </form>
+                </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
-            <td colspan="8"><i>Результаты тестирования пока не добавлены.</i></td>
+            <td colspan="{% if current_user.role != 'viewer' %}8{% else %}7{% endif %}"><i>Результаты тестирования пока не добавлены.</i></td>
         </tr>
     {% endfor %}
     </tbody>
