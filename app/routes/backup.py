@@ -1,7 +1,10 @@
 import os
-from flask import Blueprint, render_template, flash, redirect, url_for, send_file, current_app
+import shutil
+from flask import Blueprint, render_template, flash, redirect, url_for, send_file, current_app, request
 from flask_login import login_required, current_user
 from datetime import datetime
+from werkzeug.utils import secure_filename
+from app.models import db
 
 backup_bp = Blueprint('backup', __name__, url_prefix='/backup')
 
@@ -70,4 +73,51 @@ def download_backup(filename):
     if os.path.exists(file_path):
         return send_file(file_path, as_attachment=True)
     flash('Файл не найден.', 'danger')
+    return redirect(url_for('backup.backup_page'))
+
+@backup_bp.route('/restore', methods=['POST'])
+@login_required
+@admin_required
+def restore_backup():
+    db_uri = current_app.config['SQLALCHEMY_DATABASE_URI']
+    if not db_uri.startswith('sqlite:///'):
+        flash('Восстановление поддерживается только для SQLite.', 'danger')
+        return redirect(url_for('backup.backup_page'))
+
+    uploaded = request.files.get('backup_file')
+    if not uploaded or not uploaded.filename:
+        flash('Выберите файл .sqlite для восстановления.', 'warning')
+        return redirect(url_for('backup.backup_page'))
+
+    filename = secure_filename(uploaded.filename)
+    if not filename.lower().endswith('.sqlite'):
+        flash('Разрешены только файлы .sqlite.', 'danger')
+        return redirect(url_for('backup.backup_page'))
+
+    db_path = db_uri.replace('sqlite:///', '')
+    backup_dir = os.path.join(os.path.dirname(db_path), "backups")
+    os.makedirs(backup_dir, exist_ok=True)
+    now_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    temp_path = os.path.join(backup_dir, f"upload_{now_str}.sqlite")
+    pre_restore = os.path.join(backup_dir, f"pre_restore_{now_str}.sqlite")
+
+    try:
+        uploaded.save(temp_path)
+        if os.path.exists(db_path):
+            shutil.copyfile(db_path, pre_restore)
+        db.session.remove()
+        try:
+            db.engine.dispose()
+        except Exception:
+            pass
+        shutil.copyfile(temp_path, db_path)
+        flash('База данных восстановлена. Создана копия до восстановления.', 'success')
+    except Exception as e:
+        flash(f'Ошибка при восстановлении: {e}', 'danger')
+    finally:
+        try:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+        except Exception:
+            pass
     return redirect(url_for('backup.backup_page'))
