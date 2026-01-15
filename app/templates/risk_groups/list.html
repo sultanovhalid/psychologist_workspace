@@ -6,7 +6,9 @@
 <h2>Студенты «группы риска»</h2>
 
 <div style="margin: 16px 0 24px 0; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
-    <a href="{{ url_for('risk_groups.create_risk') }}" class="btn">+ Новая запись</a>
+    {% if current_user.role != 'viewer' %}
+        <a href="{{ url_for('risk_groups.create_risk') }}" class="btn">+ Новая запись</a>
+    {% endif %}
 
     <form method="get"
           action="{{ url_for('risk_groups.list_risk') }}"
@@ -66,7 +68,9 @@
             <th>Статус</th>
             <th>Дата снятия</th>
             <th>Причина</th>
-            <th style="width:180px;">Действия</th>
+            {% if current_user.role != 'viewer' %}
+                <th style="width:180px;">Действия</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -97,29 +101,31 @@
                 {% endif %}
             </td>
             <td>{{ r.reason or '—' }}</td>
-            <td>
-                <a href="{{ url_for('risk_groups.edit_risk', record_id=r.id) }}">Изменить</a>
-                {% if r.status == 'активен' %}
+            {% if current_user.role != 'viewer' %}
+                <td>
+                    <a href="{{ url_for('risk_groups.edit_risk', record_id=r.id) }}">Изменить</a>
+                    {% if r.status == 'активен' %}
+                        |
+                        <form action="{{ url_for('risk_groups.close_risk', record_id=r.id) }}"
+                              method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('Снять студента «{{ r.student.full_name if r.student else "" }}» с учёта группы риска?');">
+                            <button type="submit" class="link-button">Снять с учёта</button>
+                        </form>
+                    {% endif %}
                     |
-                    <form action="{{ url_for('risk_groups.close_risk', record_id=r.id) }}"
+                    <form action="{{ url_for('risk_groups.delete_risk', record_id=r.id) }}"
                           method="post"
                           style="display:inline;"
-                          onsubmit="return confirm('Снять студента «{{ r.student.full_name if r.student else "" }}» с учёта группы риска?');">
-                        <button type="submit" class="link-button">Снять с учёта</button>
+                          onsubmit="return confirm('Удалить запись группы риска для «{{ r.student.full_name if r.student else "" }}»?');">
+                        <button type="submit" class="link-button">Удалить</button>
                     </form>
-                {% endif %}
-                |
-                <form action="{{ url_for('risk_groups.delete_risk', record_id=r.id) }}"
-                      method="post"
-                      style="display:inline;"
-                      onsubmit="return confirm('Удалить запись группы риска для «{{ r.student.full_name if r.student else "" }}»?');">
-                    <button type="submit" class="link-button">Удалить</button>
-                </form>
-            </td>
+                </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
-            <td colspan="8"><i>Студенты «группы риска» пока не отмечены.</i></td>
+            <td colspan="{% if current_user.role != 'viewer' %}8{% else %}7{% endif %}"><i>Студенты «группы риска» пока не отмечены.</i></td>
         </tr>
     {% endfor %}
     </tbody>
