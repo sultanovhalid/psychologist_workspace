@@ -61,7 +61,11 @@ class UserForm(FlaskForm):
     full_name = StringField('ФИО', validators=[Optional(), Length(1, 128)])
     role = SelectField(
         'Роль',
-        choices=[('admin', 'Администратор'), ('psychologist', 'Психолог')],
+        choices=[
+            ('admin', 'Администратор'),
+            ('psychologist', 'Психолог'),
+            ('viewer', 'Наблюдатель'),
+        ],
         validators=[DataRequired()]
     )
     submit = SubmitField('Сохранить')
