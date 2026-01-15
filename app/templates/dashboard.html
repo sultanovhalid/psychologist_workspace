@@ -80,10 +80,13 @@
     <div style="flex: 1 1 270px; min-width: 210px;">
         <h3>Быстрые действия</h3>
         <ul style="margin-top:12px; line-height:2;">
-            <li><a href="{{ url_for('consultations.add_consultation') }}">+ Новая консультация</a></li>
-            <li><a href="{{ url_for('students.add_student') }}">+ Новый студент</a></li>
-            <li><a href="{{ url_for('groups.add_group') }}">+ Новая группа</a></li>
+            {% if current_user.role != 'viewer' %}
+                <li><a href="{{ url_for('consultations.add_consultation') }}">+ Новая консультация</a></li>
+                <li><a href="{{ url_for('students.add_student') }}">+ Новый студент</a></li>
+                <li><a href="{{ url_for('groups.add_group') }}">+ Новая группа</a></li>
+            {% endif %}
             <li><a href="{{ url_for('consultations.export_consultations') }}">Выгрузить для 1С</a></li>
+            <li><a href="{{ url_for('consultations.export_consultations_docx') }}">Выгрузить в DOCX</a></li>
             {% if current_user.is_authenticated and current_user.role == 'admin' %}
                 <li><a href="{{ url_for('admin.users') }}">Пользователи и права</a></li>
             {% endif %}
