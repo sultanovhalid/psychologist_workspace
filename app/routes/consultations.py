@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app.models import db, Consultation, Student, Group
 from app.forms import ConsultationForm, SearchForm
+from app.utils.docx_utils import create_docx_table
 import csv
 import os
 from datetime import datetime
@@ -120,3 +121,32 @@ def export_consultations():
     flash('Экспортировано в consultations_1c.csv', 'success')
     return send_file(filepath, as_attachment=True)
 
+# ----------- Экспорт в DOCX -----------
+@consultations_bp.route('/export-docx')
+@login_required
+def export_consultations_docx():
+    consultations = Consultation.query.order_by(Consultation.date.desc()).all()
+
+    export_folder = os.path.join(current_app.root_path, 'export')
+    os.makedirs(export_folder, exist_ok=True)
+    filename = 'consultations_1c.docx'
+    filepath = os.path.join(export_folder, filename)
+
+    headers = [
+        'Дата', 'ФИО студента', 'Группа', 'Тема', 'Тип консультации', 'Результат', 'Психолог'
+    ]
+    rows = []
+    for c in consultations:
+        rows.append([
+            c.date.strftime('%Y-%m-%d %H:%M'),
+            c.student.full_name if c.student else '',
+            c.group.name if c.group else '',
+            c.topic or '',
+            c.consultation_type,
+            c.result or '',
+            c.psychologist or ''
+        ])
+
+    create_docx_table(filepath, 'Экспорт консультаций', headers, rows)
+    flash('Экспортировано в consultations_1c.docx', 'success')
+    return send_file(filepath, as_attachment=True)
