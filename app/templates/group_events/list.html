@@ -6,7 +6,9 @@
 <h2>Групповые мероприятия</h2>
 
 <div style="margin: 16px 0 24px 0; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
-    <a href="{{ url_for('group_events.create_event') }}" class="btn">+ Новое мероприятие</a>
+    {% if current_user.role != 'viewer' %}
+        <a href="{{ url_for('group_events.create_event') }}" class="btn">+ Новое мероприятие</a>
+    {% endif %}
 
     <form method="get"
           action="{{ url_for('group_events.list_events') }}"
@@ -52,7 +54,9 @@
             <th>Тип</th>
             <th>Психолог</th>
             <th>Участников</th>
-            <th style="width:150px;">Действия</th>
+            {% if current_user.role != 'viewer' %}
+                <th style="width:150px;">Действия</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -82,20 +86,22 @@
                     —
                 {% endif %}
             </td>
-            <td>
-                <a href="{{ url_for('group_events.edit_event', event_id=e.id) }}">Изменить</a>
-                |
-                <form action="{{ url_for('group_events.delete_event', event_id=e.id) }}"
-                      method="post"
-                      style="display:inline;"
-                      onsubmit="return confirm('Удалить мероприятие «{{ e.title }}»?');">
-                    <button type="submit" class="link-button">Удалить</button>
-                </form>
-            </td>
+            {% if current_user.role != 'viewer' %}
+                <td>
+                    <a href="{{ url_for('group_events.edit_event', event_id=e.id) }}">Изменить</a>
+                    |
+                    <form action="{{ url_for('group_events.delete_event', event_id=e.id) }}"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Удалить мероприятие «{{ e.title }}»?');">
+                        <button type="submit" class="link-button">Удалить</button>
+                    </form>
+                </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
-            <td colspan="7"><i>Групповых мероприятий пока нет.</i></td>
+            <td colspan="{% if current_user.role != 'viewer' %}7{% else %}6{% endif %}"><i>Групповых мероприятий пока нет.</i></td>
         </tr>
     {% endfor %}
     </tbody>
