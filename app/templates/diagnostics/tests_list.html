@@ -6,7 +6,9 @@
 <h2>Психодиагностические методики</h2>
 
 <div style="margin: 16px 0 24px 0;">
-    <a href="{{ url_for('diagnostics.create_test') }}" class="btn">+ Новая методика</a>
+    {% if current_user.role != 'viewer' %}
+        <a href="{{ url_for('diagnostics.create_test') }}" class="btn">+ Новая методика</a>
+    {% endif %}
 </div>
 
 <table>
@@ -17,7 +19,9 @@
             <th>Краткое название</th>
             <th>Целевая группа</th>
             <th>Описание</th>
-            <th style="width:150px;">Действия</th>
+            {% if current_user.role != 'viewer' %}
+                <th style="width:150px;">Действия</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -28,20 +32,22 @@
             <td>{{ t.short_name or '—' }}</td>
             <td>{{ t.target_group or '—' }}</td>
             <td>{{ t.description or '—' }}</td>
-            <td>
-                <a href="{{ url_for('diagnostics.edit_test', test_id=t.id) }}">Изменить</a>
-                |
-                <form action="{{ url_for('diagnostics.delete_test', test_id=t.id) }}"
-                      method="post"
-                      style="display:inline;"
-                      onsubmit="return confirm('Удалить методику «{{ t.name }}»?');">
-                    <button type="submit" class="link-button">Удалить</button>
-                </form>
-            </td>
+            {% if current_user.role != 'viewer' %}
+                <td>
+                    <a href="{{ url_for('diagnostics.edit_test', test_id=t.id) }}">Изменить</a>
+                    |
+                    <form action="{{ url_for('diagnostics.delete_test', test_id=t.id) }}"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Удалить методику «{{ t.name }}»?');">
+                        <button type="submit" class="link-button">Удалить</button>
+                    </form>
+                </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
-            <td colspan="6"><i>Методики пока не добавлены.</i></td>
+            <td colspan="{% if current_user.role != 'viewer' %}6{% else %}5{% endif %}"><i>Методики пока не добавлены.</i></td>
         </tr>
     {% endfor %}
     </tbody>
